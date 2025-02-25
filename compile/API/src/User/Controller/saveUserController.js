@@ -1,0 +1,71 @@
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SaveUserController = void 0;
+const tsyringe_1 = require("tsyringe");
+const httpService_1 = __importDefault(require("../../Shared/Infraestructure/Services/httpService"));
+const dependecy_names_1 = require("../../Shared/Infraestructure/dependecy-names");
+const Uuid_1 = require("../../Shared/Models/Uuid");
+const uuidv4_1 = require("uuidv4");
+const Name_1 = require("../../Shared/Models/Name");
+const User_1 = require("../Model/User");
+const SecureDate_1 = require("../../Shared/Models/SecureDate");
+let SaveUserController = class SaveUserController {
+    constructor(httpService, userRepository) {
+        this.httpService = httpService;
+        this.userRepository = userRepository;
+    }
+    execute(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                console.log("llega hasta aqui?"); //DEBUG
+                if (!request.body) {
+                    this.httpService.badRequest(response, "TNo se proporcionó cuerpo.");
+                    return;
+                }
+                console.log("y aquí?"); //DEBUG
+                const id = new Uuid_1.Uuid(request.body.id ? request.body.id : (0, uuidv4_1.uuid)());
+                const name = new Name_1.Name(request.body.name);
+                const email = new Name_1.Name(request.body.email);
+                const birthDate = new SecureDate_1.SecureDate(new Date(request.body.birthDate));
+                console.log(id.value + name.value + email.value + birthDate.value + 1 + "1asd");
+                const user = new User_1.User(id, name, email, birthDate);
+                console.log(user);
+                yield this.userRepository.saveUser(user);
+                this.httpService.ok(response, { message: "User registration was succesful", user: user.getPrimitives() });
+            }
+            catch (error) {
+                this.httpService.badRequest(response, error);
+            }
+        });
+    }
+};
+exports.SaveUserController = SaveUserController;
+exports.SaveUserController = SaveUserController = __decorate([
+    (0, tsyringe_1.injectable)(),
+    __param(1, (0, tsyringe_1.inject)(dependecy_names_1.USER_REPOSITORY)),
+    __metadata("design:paramtypes", [httpService_1.default, Object])
+], SaveUserController);

@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "foreignKeys"
+}
+
+model User {
+  id          String   @id @default(uuid())
+  name        String
+  email       String   @unique
+  birthDate   DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  password    String?
+  accessToken String?
+
+  cats Cat[] // Json ignore?
+}
+
+model Cat {
+  id        String    @id @default(uuid())
+  name      String
+  age       Int?
+  breed     String
+  sex       Boolean   @default(true)
+  clawsSize clawsSize @default(UNKNOWN)
+  bloodType BloodType @default(UNKNOWN)
+  ownerId   String?
+  owner     User?     @relation(fields: [ownerId], references: [id])
+}
+
+enum BloodType {
+  UNKNOWN
+  A
+  B
+  AB
+  O
+}
+
+enum clawsSize {
+  UNKNOWN
+  SMALL
+  MEDIUM
+  BIG
+  LARGE
+}
